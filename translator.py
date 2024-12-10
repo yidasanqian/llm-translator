@@ -134,7 +134,7 @@ def draw_text(c, text, x, y, font_name, chars):
             # 更新y_offset，用于下一个字符的位置
             y_offset -= char['size']  # 根据字符大小调整间距  
     else:
-        c.drawString(x, y, text)
+        c.drawString(x, y, text)      
 
 
 def handle_pdf(trans_page, input_pdf_path, output_pdf_path, source_lang, target_lang):
@@ -161,22 +161,15 @@ def handle_pdf(trans_page, input_pdf_path, output_pdf_path, source_lang, target_
             c.setPageSize((page_width, page_height))
 
             # 提取文本行（保留空行和空格）
-            lines = page.extract_text_lines(keep_blank_chars=True)
-            # 取后5行
-            lines = lines[-1:]
+            lines = page.extract_text_lines(keep_blank_chars=True)           
+            lines = lines[25:]  # 设置翻译行范围
             for line in lines:
                 text = line['text']
                 chars = line.get('chars', [])
                 if text.strip() == '':
                     translated_text = text  # 空行保持原样
-                else:
-                    segments = process_text_with_math(text)
-                    translated_text = ""
-                    for segment_type, content in segments:
-                        if segment_type == "math":
-                            translated_text += content  # 数学公式保持原样
-                        else:
-                            translated_text += translate_text(content, source_lang, target_lang)
+                else:   
+                    translated_text = translate_text(text, source_lang, target_lang)
 
                 # 检查文本方向并翻转 Y 坐标
                 x0, y0 = line['x0'], page_height - line['top']
@@ -222,7 +215,7 @@ if __name__ == '__main__':
     output_pdf_path = './output/2410.13085v1_translated.pdf'
     source_lang = 'en'
     target_lang = 'zh-cn'
-    trans_page = "1"  # 设置翻译页码范围
+    trans_page = "2"  # 设置翻译页码范围
 
     handle_pdf(trans_page, input_pdf_path, output_pdf_path, source_lang, target_lang)
     logger.info("PDF 翻译完成！")
